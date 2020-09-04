@@ -1,44 +1,47 @@
-use anyhow::{anyhow, Result};
-use log;
-use std::env;
+use chrono::Utc;
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 use structopt::StructOpt;
 
+mod action;
 mod options;
 
 use options::MongoMigrate;
 
-fn main() {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let args = MongoMigrate::from_args();
 
     if env::var_os("RUST_LOG").is_none() {
-        env::set_var("RUST_LOG", "mongo_migrate=info");
+        env::set_var("RUST_LOG", "migrate_mongo=info");
     }
+    env_logger::init();
+
+    let now = Utc::now();
 
     match args {
-        MongoMigrate::Create(_args) => create(),
-        MongoMigrate::Down(_args) => down(),
-        MongoMigrate::Init(_args) => init(),
-        MongoMigrate::Status(_args) => status(),
-        MongoMigrate::Up(_args) => up(),
+        MongoMigrate::Create(args) => action::create::run(&migration_dir("."), now, args).await,
+        MongoMigrate::Down(_args) => action::down::run().await,
+        MongoMigrate::Init(_args) => action::init::run().await,
+        MongoMigrate::Status(_args) => action::status::run().await,
+        MongoMigrate::Up(_args) => action::up::run().await,
     }
 }
 
-fn create() {
-    println!("Create a new migration");
-}
+fn migration_dir(path: &str) -> PathBuf {
+    let migration_dir = Path::new(path)
+        .canonicalize()
+        .expect("Unable to canonicalize the migration_dir");
 
-fn down() {
-    println!("Downgrade the database using the last migration");
-}
+    if !migration_dir.is_dir() {
+        panic!(
+            "Migration path was not a directory, maybe it's missing? - received: \"{}\" => \"{}\"",
+            path,
+            migration_dir.to_string_lossy(),
+        );
+    }
 
-fn init() {
-    println!("Initialize the system");
-}
-
-fn status() {
-    println!("print current migration status");
-}
-
-fn up() {
-    println!("Upgrade the database to the latest version specified by the user migrations");
+    migration_dir
 }

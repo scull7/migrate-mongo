@@ -1,17 +1,15 @@
+use crate::action::create;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "mongo-migrate")]
 pub enum MongoMigrate {
-    Create(Create),
+    Create(create::Args),
     Down(Down),
     Init(Init),
     Status(Status),
     Up(Up),
 }
-
-#[derive(Debug, StructOpt)]
-pub struct Create {}
 
 #[derive(Debug, StructOpt)]
 pub struct Down {}
