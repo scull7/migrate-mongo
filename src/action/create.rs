@@ -8,11 +8,11 @@ use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "create")]
 pub struct Args {
-    /// This is the file name to use for this migration.  It is advised that you keep this name
-    /// unique amongst all of your migrations, however, this is not required. This is because the
-    /// name will be prefixed with the current time in an ISO8601 standard format of
-    /// YYYYMMDDhhmmss followed by an underscore.
-    /// e.g. 20200916023109_my_migration_name.json
+    /// This is the file name to use for this migration. SHOULD BE unique.
+    // It is advised that you keep this name unique amongst all of your migrations, however,
+    // this is not required. This is because the ame will be prefixed with the current time in an
+    // ISO8601 standard format of YYYYMMDDhhmmss followed by an underscore.
+    // e.g. 20200916023109_my_migration_name.json
     name: String,
 }
 
